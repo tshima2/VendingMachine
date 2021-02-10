@@ -1,0 +1,44 @@
+vm = VendingMachine.new 
+
+###########################################
+puts "お金を投入-50"
+p vm.slot_money(50)
+
+puts "現在の投入金額確認"
+p vm.current_slot_money
+
+puts "現在の在庫確認"
+p vm.stock
+
+puts "現在購入可能なリスト確認"
+p vm.available_items
+###########################################
+
+puts "お金を投入-100"
+p vm.slot_money(100)
+
+puts "現在の投入金額確認"
+p vm.current_slot_money
+
+puts "現在購入可能なリスト確認"
+p vm.available_items
+
+puts "コーラを買う"
+p vm.purchase(:cola)
+
+puts "現在の投入金額確認"
+p vm.current_slot_money
+
+puts "現在購入可能なリスト確認"
+p vm.available_items
+
+puts "現在の在庫確認"
+p vm.stock
+
+###########################################
+
+puts "いったん払い戻す"
+p vm.return_money
+
+puts "現在の投入金額確認"
+p vm.current_slot_money
