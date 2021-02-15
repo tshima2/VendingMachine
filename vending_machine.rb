@@ -47,33 +47,40 @@ class VendingMachine
   # 10円玉、50円玉、100円玉、500円玉、1000円札を１つずつ投入できる。
   # 投入は複数回できる。
   def slot_money(money)
+    # 自動販売機にお金を入れる
+
     # 想定外のもの（１円玉や５円玉。千円札以外のお札、そもそもお金じゃないもの（数字以外のもの）など）
     # が投入された場合は、投入金額に加算せず、それをそのまま釣り銭としてユーザに出力する。
-    return false unless MONEY.include?(money)
-    # 自動販売機にお金を入れる
-    @slot_money += money
+    if( MONEY.include?(money) )
+      @slot_money += money
+      true;
+    else
+      false;
+    end
   end
 
   # 払い戻し操作を行うと、投入金額の総計を釣り銭として出力する。
   def return_money
     # 返すお金の金額を表示する
-    puts @slot_money
+    ret=@slot_money;
+    puts "釣り銭#{@slot_money}円"
     # 自動販売機に入っているお金を0円に戻す
     @slot_money=0
+    ret
   end
 
   #ステップ２　ジュースの管理
   #格納されているジュースの情報（値段と名前と在庫）を取得できる。
   def stock
     ret=""
-    @stock.each do |key, val|
-      ret += "商品名:#{key}"
-      ret += "価格:#{ITEMS_PRICE[key]}"
-      ret += "在庫数:#{val}"
+    @stock.each do |item_name, item_stocks|
+      ret += "商品名:#{item_name}"
+      ret += "価格:#{ITEMS_PRICE[item_name]}"
+      ret += "在庫数:#{items_stocks}"
     end
     ret
   end
-
+  
   #ステップ３　購入
   # 投入金額、在庫の点で、コーラが購入できるかどうかを取得できる。
   # 投入金額が足りない場合もしくは在庫がない場合、購入操作を行っても何もしない。
@@ -91,9 +98,6 @@ class VendingMachine
       @slot_money-=ITEMS_PRICE[item]
       @sales+=ITEMS_PRICE[item]
       @stock[item]-=1
-
-      #払い戻し操作では現在の投入金額からジュース購入金額を引いた釣り銭を出力する。
-      otsuri
     end
     rval
   end
@@ -106,27 +110,25 @@ class VendingMachine
   #ステップ４　機能拡張
   #払い戻し操作では現在の投入金額からジュース購入金額を引いた釣り銭を出力する。
   def refund(item)
-    @slot_money-=ITEMS_PRICE[item]
+    purchase(item) ? @slot_money : false
   end
 
-  
-  #投入金額、在庫の点で購入可能なドリンクのリストを取得できる。  
+  # 投入金額、在庫の点で購入可能なドリンクのリストを取得できる。
   def available_items
-    items=[]
-    ITEMS_PRICE.each do |key,val|
-      if @slot_money >= val
-        items << key
+    ret_array=[]
+    @stock.each do |item_name, item_stocks|
+      if (@slot_money>=ITEMS_PRICE[item_name]) && (item_stocks>0)
+        ret_array << item_name
       end
     end
-    items
+    ret_array
   end
 
-  # ステップ５　釣り銭と売り上げ管理  
-  def otsuri
-    if @slot_money>0
-      puts "釣り銭#{@slot_money}円"
-      @slot_money=0
-    end
-  end
+  # ステップ５　釣り銭と売り上げ管理
+=begin
+  ジュース値段以上の投入金額が投入されている条件下で購入操作を行うと、釣り銭（投入金額とジュース値段の差分）を出力する。
+  ジュースと投入金額が同じ場合、つまり、釣り銭0円の場合も、釣り銭0円と出力する。
+  釣り銭の硬貨の種類は考慮しなくてよい。
+=end
 
 end
