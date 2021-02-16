@@ -1,5 +1,7 @@
 require 'minitest/autorun'
-require './vending_machine.rb'
+require './vending_machine_v2.rb'
+require './drink.rb'
+require './inventory.rb'
 
 class VendingMachineTest<Minitest::Test
   def test_vending_machine
@@ -31,18 +33,18 @@ class VendingMachineTest<Minitest::Test
     vm.slot_money(50)
     vm.slot_money(100)
     assert_equal 150, vm.current_slot_money
-    assert_equal [:cola], vm.available_items
+    assert_equal [Drink::Kind::COLA], vm.available_items
 
     # case5 購入する
-    assert_equal false, vm.purchase(:redbull) 
-    assert_equal true, vm.purchase(:cola)
+    assert_equal false, vm.purchase(Drink::Kind::REDBULL)
+    assert_equal true, vm.purchase(Drink::Kind::COLA)
     assert_equal 30, vm.current_slot_money
 
     # case6 （購入してから）払い戻す
     assert_equal true, vm.slot_money(100)
     assert_equal 130, vm.current_slot_money
-    assert_equal false, vm.refund(:redbull)
-    assert_equal 10, vm.refund(:cola)
+    assert_equal 10, vm.refund(Drink::Kind::COLA)
+    assert_equal false, vm.refund(Drink::Kind::COLA)
 
   end
 end
