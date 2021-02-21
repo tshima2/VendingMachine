@@ -11,7 +11,9 @@ class Inventory
 
   #在庫の追加
   def add(drink_obj, num)
-    if( @hash_num.has_key? (drink_obj.kind))
+    if( drink_obj.class != Drink)
+      puts "Drink object is needed." #return nil
+    elsif( @hash_num.has_key? (drink_obj.kind))
       @hash_num[drink_obj.kind] += num
     else
       @hash_num[drink_obj.kind] = num
@@ -20,7 +22,10 @@ class Inventory
 
   #在庫の払い出し
   def pull(kind, num)
-    if( !@hash_num.has_key?(kind))
+    if( kind.class != Integer)
+      puts "種別は正の整数値を指定してください." #return nil
+    elsif( !@hash_num.has_key?(kind))
+      puts "指定された種別の在庫がありません."
       return 0
     else
       a=[];
@@ -33,7 +38,11 @@ class Inventory
 
   #在庫の払い出し（１つ）
   def pull_one(kind)
-    pull(kind, 1)
+    if( kind.class != Integer)
+      puts "種別は正の整数値を指定してください." #return nil
+    else
+      pull(kind, 1)
+    end
   end
 
   #在庫情報を文字列で返す
@@ -42,7 +51,7 @@ class Inventory
     @hash_num.each do |kind, num|
       ret += "商品名:#{Drink::name(kind)},"
       ret += "価格:#{Drink::price(kind)},"
-      ret += "在庫数:#{num}"
+      ret += "在庫数:#{num}\n"
     end
     ret
   end
@@ -65,8 +74,10 @@ class Inventory
 (例2）投入金額800円, コーラの金額120円, 在庫数4本 => 戻り値 (4, 32)
 =end
   def can_buy?(kind, input_money)
+    if( kind.class != Integer)
+      puts "種別は正の整数値を指定してください." #return nil
     #投入金額が足りなければ0を返却
-    if Drink::price(kind) && input_money < Drink::price(kind)
+    elsif Drink::price(kind) && input_money < Drink::price(kind)
       return 0
     elsif @hash_num.has_key?(kind)
       #投入金額を購入したい物の価格で割った商と余りを配列に格納
