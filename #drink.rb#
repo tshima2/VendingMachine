@@ -117,4 +117,4 @@ end
 
 # 例外クラス定義
 class DrinkInitializeError < StandardError
-end
+end 
