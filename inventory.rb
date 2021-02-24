@@ -28,7 +28,7 @@ class Inventory
       puts "指定された種別の在庫がありません."
       return 0
     else
-      a=[];
+      a=[]
       pull_num=a.push(@hash_num[kind], num).min
       @hash_num[kind] -= pull_num
       @sales += ( pull_num * Drink::price(kind) )  #払い出した分の売り上げをカウント
@@ -38,11 +38,11 @@ class Inventory
 
   #在庫の払い出し（１つ）
   def pull_one(kind)
-    if( kind.class != Integer)
-      puts "種別は正の整数値を指定してください." #return nil
-    else
+    # if( kind.class != Integer)
+    #   puts "種別は正の整数値を指定してください." #return nil
+    # else
       pull(kind, 1)
-    end
+    # end
   end
 
   #在庫情報を文字列で返す
@@ -63,7 +63,8 @@ class Inventory
 
   #売り上げの回収
   def reset_sales
-    ret=@sales; @sales=0
+    ret=@sales
+    @sales=0
     ret
   end
 
@@ -71,7 +72,7 @@ class Inventory
   引数で与えられた金額で, 引数で与えられた名前の飲み物が購入できるかどうかを取得
 　購入できる場合は購入可能本数とお釣りを配列で返却, 購入できない場合は 0を返却
 (例1）投入金額800円, コーラの金額120円, 在庫数12本 => 戻り値 (6, 80)
-(例2）投入金額800円, コーラの金額120円, 在庫数4本 => 戻り値 (4, 32)
+(例2）投入金額800円, コーラの金額120円, 在庫数4本 => 戻り値 (4, 320)
 =end
   def can_buy?(kind, input_money)
     if( kind.class != Integer)
@@ -84,9 +85,10 @@ class Inventory
       ret = input_money.divmod(Drink::price(kind))
       if( @hash_num[kind] > ret[0] )
         #在庫が充分多い
-        return ret;
+        return ret
       else
         #在庫が少ない
+        ret = []
         otsuri = ( input_money - Drink::price(kind)*@hash_num[kind] )
         return ret.push(@hash_num[kind], otsuri)
       end
