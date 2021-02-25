@@ -3,6 +3,14 @@ require './drink.rb'
 #在庫/売上管理クラス
 class Inventory
 
+  #エラーメッセージ
+  MsgErrInvalidObject='取り扱い対象外です.'
+  MsgErrUnRegisterdKind='指定された飲み物は未登録です.'  
+  MsgErrInvalidNumber='個数は正の整数値を指定してください.'
+  MsgErrInvalidMoney='金額は正の整数値を指定してください.'  
+  MsgErrInvalidKind='種別は正の整数値を指定してください.'
+  MsgErrOutOfStocks='指定された種別の在庫がありません.'
+
   #初期化
   def initialize
     @hash_num={}    # {1:  50, 2:  50, 3:  50}  商品種別をキーとするハッシュ
@@ -11,9 +19,13 @@ class Inventory
 
   #在庫の追加
   def add(drink_obj, num)
-    if( drink_obj.class != Drink)
-      puts "Drink object is needed." #return nil
-    elsif( @hash_num.has_key? (drink_obj.kind))
+    if( drink_obj.class != Drink )
+      puts MsgErrInvalidObject #return nil
+    elsif !(Drink::present?(drink_obj.kind))
+      puts MsgErrUnRegisterdKind #return nil
+    elsif( !(num.class==Integer && num>0) )
+      puts MsgErrInvalidNumber #return nil
+    elsif( @hash_num.has_key? (drink_obj.kind) )
       @hash_num[drink_obj.kind] += num
     else
       @hash_num[drink_obj.kind] = num
@@ -22,14 +34,15 @@ class Inventory
 
   #在庫の払い出し
   def pull(kind, num)
-    if( kind.class != Integer)
-      puts "種別は正の整数値を指定してください." #return nil
+    if( !(kind.class==Integer && kind >=0) ) #種別が正の整数でなければnilを返却
+      puts MsgErrInvalidKind #return nil
+    elsif( !(num.class==Integer && num >=0) )
+      puts MsgErrInvalidNumber #return nil
     elsif( !@hash_num.has_key?(kind))
-      puts "指定された種別の在庫がありません."
+      puts MsgErrOutOfStocks
       return 0
     else
-      a=[]
-      pull_num=a.push(@hash_num[kind], num).min
+      pull_num = (@hash_num[kind] < num) ? @hash_num[kind] : num
       @hash_num[kind] -= pull_num
       @sales += ( pull_num * Drink::price(kind) )  #払い出した分の売り上げをカウント
       return pull_num
@@ -38,11 +51,7 @@ class Inventory
 
   #在庫の払い出し（１つ）
   def pull_one(kind)
-    # if( kind.class != Integer)
-    #   puts "種別は正の整数値を指定してください." #return nil
-    # else
-      pull(kind, 1)
-    # end
+    pull(kind, 1)
   end
 
   #在庫情報を文字列で返す
@@ -75,10 +84,9 @@ class Inventory
 (例2）投入金額800円, コーラの金額120円, 在庫数4本 => 戻り値 (4, 320)
 =end
   def can_buy?(kind, input_money)
-    if( kind.class != Integer)
-      puts "種別は正の整数値を指定してください." #return nil
-    #投入金額が足りなければ0を返却
-    elsif Drink::price(kind) && input_money < Drink::price(kind)
+    if( !(kind.class==Integer && kind >= 0) ) #種別が正の整数でなければnilを返却
+      puts MsgErrInvalidKind #return nil
+    elsif Drink::price(kind) && input_money < Drink::price(kind) #投入金額が足りなければ0を返却
       return 0
     elsif @hash_num.has_key?(kind)
       #投入金額を購入したい物の価格で割った商と余りを配列に格納
@@ -98,12 +106,16 @@ class Inventory
   end
 
   def available_items(input_money)
-    ret_array=[]
-    @hash_num.each do |kind, num|
-      if ( Drink::price(kind) && (input_money >= Drink::price(kind)) && (num>0) )
-        ret_array << kind
+    if( !(input_money==Integer && input_money >= 0) ) #入力された金額が正の整数でなければnilを返却
+      puts MsgErrInvalidMoney #return nil
+    elsif
+      ret_array=[]
+      @hash_num.each do |kind, num|
+        if ( Drink::price(kind) && (input_money >= Drink::price(kind)) && (num>0) )
+          ret_array << kind
+        end
       end
+      ret_array
     end
-    ret_array
   end
 end
